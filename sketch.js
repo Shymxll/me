@@ -9,8 +9,8 @@ let sketch = function (p) {
         maxSpeed: 2,
         eyeFormation: {
             enabled: true,
-            interval: 300, // frames between eye formations
-            duration: 180, // frames to maintain eye shape
+            interval: 600, // frames between eye formations
+            duration: 380, // frames to maintain eye shape
             outerRadius: 100, // white of the eye (sclera)
             irisRadius: 60,   // colored part (iris)
             pupilRadius: 25    // center black part (pupil)
