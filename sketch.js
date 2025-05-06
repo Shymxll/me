@@ -181,15 +181,6 @@ let sketch = function (p) {
             p.noStroke();
             p.circle(dot.position.x, dot.position.y, dot.size * 2);
         }
-
-        // Display status info
-        p.fill(255);
-        p.textSize(14);
-        p.text("Dot Count: " + dots.length, 10, 20);
-        p.text("Eye Formation: " + (isFormingEye ? "Active" : "Inactive"), 10, 40);
-        p.text("Timer: " + eyeFormationTimer, 10, 60);
-        p.text("Press 'e' to toggle eye formation", 10, 80);
-        p.text("Press 'f' to force eye formation", 10, 100);
     };
 
     // Create a force to keep dots inside the boundaries
@@ -344,18 +335,7 @@ let sketch = function (p) {
 // Create instance and add it to the page
 document.addEventListener('DOMContentLoaded', function () {
     console.log("DOM loaded, creating p5 instance");
+    // Disable global p5 instance to prevent defaultCanvas creation
+    p5.disableFriendlyErrors = true;
     new p5(sketch, 'canvasContainer');
-});
-
-// Also try global mode
-function setup() {
-    console.log("Global mode setup");
-    createCanvas(400, 400);
-    background(0);
-    fill(255);
-    circle(width / 2, height / 2, 50);
-}
-
-function draw() {
-    // Nothing in global mode
-} 
+}); 
