@@ -139,6 +139,11 @@ let sketch = function (p) {
                 dot.acceleration.add(separation);
                 dot.acceleration.add(alignment);
                 dot.acceleration.add(cohesion);
+
+                // Add boundary force to keep dots inside the canvas
+                const boundaryForce = createBoundaryForce(dot);
+                boundaryForce.mult(1.5); // Stronger force for boundaries
+                dot.acceleration.add(boundaryForce);
             }
 
             // Update velocity and position
@@ -146,11 +151,25 @@ let sketch = function (p) {
             dot.velocity.limit(dot.maxSpeed);
             dot.position.add(dot.velocity);
 
-            // Wrap around edges
-            if (dot.position.x < 0) dot.position.x = p.width;
-            if (dot.position.x > p.width) dot.position.x = 0;
-            if (dot.position.y < 0) dot.position.y = p.height;
-            if (dot.position.y > p.height) dot.position.y = 0;
+            // Keep dots inside boundaries with bounce effect
+            const margin = dot.size;
+
+            if (dot.position.x < margin) {
+                dot.position.x = margin;
+                dot.velocity.x *= -1; // Reverse x velocity (bounce)
+            }
+            if (dot.position.x > p.width - margin) {
+                dot.position.x = p.width - margin;
+                dot.velocity.x *= -1; // Reverse x velocity (bounce)
+            }
+            if (dot.position.y < margin) {
+                dot.position.y = margin;
+                dot.velocity.y *= -1; // Reverse y velocity (bounce)
+            }
+            if (dot.position.y > p.height - margin) {
+                dot.position.y = p.height - margin;
+                dot.velocity.y *= -1; // Reverse y velocity (bounce)
+            }
 
             // Draw dot with its assigned color (only in eye formation)
             if (isFormingEye) {
@@ -172,6 +191,39 @@ let sketch = function (p) {
         p.text("Press 'e' to toggle eye formation", 10, 80);
         p.text("Press 'f' to force eye formation", 10, 100);
     };
+
+    // Create a force to keep dots inside the boundaries
+    function createBoundaryForce(dot) {
+        const force = p.createVector(0, 0);
+        const margin = 50; // How close to the edge before feeling the force
+        const maxForce = 0.1; // Maximum boundary force
+
+        // Left boundary
+        if (dot.position.x < margin) {
+            const strength = p.map(dot.position.x, 0, margin, maxForce, 0);
+            force.x += strength;
+        }
+
+        // Right boundary
+        if (dot.position.x > p.width - margin) {
+            const strength = p.map(dot.position.x, p.width - margin, p.width, 0, -maxForce);
+            force.x += strength;
+        }
+
+        // Top boundary
+        if (dot.position.y < margin) {
+            const strength = p.map(dot.position.y, 0, margin, maxForce, 0);
+            force.y += strength;
+        }
+
+        // Bottom boundary
+        if (dot.position.y > p.height - margin) {
+            const strength = p.map(dot.position.y, p.height - margin, p.height, 0, -maxForce);
+            force.y += strength;
+        }
+
+        return force;
+    }
 
     // Key pressed handler
     p.keyPressed = function () {
