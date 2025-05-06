@@ -4,9 +4,9 @@
 let sketch = function (p) {
     // Configuration
     const config = {
-        dotCount: 300,
-        dotSize: 5,
-        maxSpeed: 2,
+        dotCount: 600,
+        dotSize: 1,
+        maxSpeed: 2.5,
         eyeFormation: {
             enabled: true,
             interval: 600, // frames between eye formations
