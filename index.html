@@ -5,27 +5,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dot Art with p5.js</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+    <!-- Using a different p5.js source -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>
+    <!-- jQuery for debugging -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             margin: 0;
             padding: 0;
             overflow: hidden;
-            background-color: #f0f0f0;
+            background-color: #000;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            font-family: Arial, sans-serif;
         }
 
         canvas {
             display: block;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #333;
+        }
+
+        #debugInfo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            z-index: 100;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #testButton {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
         }
     </style>
 </head>
 
 <body>
+    <div id="debugInfo">
+        <p>Tarayıcı konsolu hata olup olmadığını kontrol edin (F12 tuşuna basın)</p>
+        <p>P5.js durumu: <span id="p5status">Yükleniyor...</span></p>
+        <button id="testButton">Test Çizim</button>
+    </div>
+
+    <script>
+        // Check if p5.js is loaded
+        $(document).ready(function () {
+            if (typeof p5 !== 'undefined') {
+                $('#p5status').text("Yüklendi ✓");
+                console.log("p5.js loaded successfully");
+            } else {
+                $('#p5status').text("HATA: Yüklenemedi ✗");
+                console.error("p5.js failed to load");
+            }
+
+            // Test drawing directly with jquery
+            $('#testButton').click(function () {
+                // Draw something directly on canvas if p5 is loaded
+                if (typeof p5 !== 'undefined') {
+                    console.log("Trying to draw directly...");
+                    // Get the canvas element and draw something simple
+                    const canvas = $('canvas')[0];
+                    if (canvas) {
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = 'red';
+                        ctx.fillRect(100, 100, 200, 200);
+                        console.log("Manual drawing complete");
+                    } else {
+                        console.error("No canvas found");
+                    }
+                }
+            });
+        });
+    </script>
+
+    <div id="canvasContainer"></div>
     <script src="sketch.js"></script>
 </body>
 
