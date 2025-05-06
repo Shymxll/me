@@ -12,8 +12,8 @@ let sketch = function (p) {
             interval: 600, // frames between eye formations
             duration: 380, // frames to maintain eye shape
             outerRadius: 100, // white of the eye (sclera)
-            irisRadius: 60,   // colored part (iris)
-            pupilRadius: 25    // center black part (pupil)
+            irisRadius: 20,   // colored part (iris)
+            pupilRadius: 10    // center black part (pupil)
         }
     };
 
