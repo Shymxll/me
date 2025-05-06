@@ -11,8 +11,9 @@ let sketch = function (p) {
             enabled: true,
             interval: 300, // frames between eye formations
             duration: 180, // frames to maintain eye shape
-            radius: 100,   // outer circle radius
-            pupilRadius: 40 // inner circle (pupil) radius
+            outerRadius: 100, // white of the eye (sclera)
+            irisRadius: 60,   // colored part (iris)
+            pupilRadius: 25    // center black part (pupil)
         }
     };
 
@@ -39,12 +40,32 @@ let sketch = function (p) {
                 color: p.color(255),
                 maxSpeed: config.maxSpeed,
                 maxForce: 0.1,
-                targetPosition: p.createVector(0, 0)
+                targetPosition: p.createVector(0, 0),
+                eyePartIndex: 0 // 0: white, 1: iris, 2: pupil
             });
         }
 
-        // Initialize eye target
+        // Initialize eye target to center of canvas
         eyeTarget = p.createVector(p.width / 2, p.height / 2);
+
+        // Assign each dot a fixed part of the eye
+        const whiteCount = Math.floor(dots.length * 0.5); // 50% for the white
+        const irisCount = Math.floor(dots.length * 0.3);  // 30% for the iris
+        // Remaining 20% for the pupil
+
+        // Randomly assign eye parts
+        for (let i = 0; i < dots.length; i++) {
+            if (i < whiteCount) {
+                dots[i].eyePartIndex = 0; // white part
+                dots[i].color = p.color(57, 255, 20); // neon green
+            } else if (i < whiteCount + irisCount) {
+                dots[i].eyePartIndex = 1; // iris part
+                dots[i].color = p.color(57, 255, 20); // neon green iris
+            } else {
+                dots[i].eyePartIndex = 2; // pupil part
+                dots[i].color = p.color(0, 0, 0); // black pupil
+            }
+        }
 
         console.log("Setup complete");
     };
@@ -61,9 +82,9 @@ let sketch = function (p) {
             if (!isFormingEye && eyeFormationTimer >= config.eyeFormation.interval) {
                 isFormingEye = true;
                 eyeFormationTimer = 0;
-                eyeTarget = p.createVector(p.random(p.width * 0.3, p.width * 0.7),
-                    p.random(p.height * 0.3, p.height * 0.7));
-                console.log("Starting eye formation at", eyeTarget.x, eyeTarget.y);
+                // Always set the eye target to the center of the canvas
+                eyeTarget = p.createVector(p.width / 2, p.height / 2);
+                console.log("Starting eye formation at center");
             }
 
             // End eye formation
@@ -82,9 +103,21 @@ let sketch = function (p) {
             dot.acceleration.mult(0);
 
             if (isFormingEye) {
-                // Calculate target position for eye formation
-                const angle = p.map(i, 0, dots.length, 0, p.TWO_PI);
-                const radius = i < dots.length * 0.7 ? config.eyeFormation.radius : config.eyeFormation.pupilRadius;
+                // Calculate target position for eye formation based on dot's eye part
+                const angle = p.map(i % (dots.length / 3), 0, dots.length / 3, 0, p.TWO_PI);
+                let radius;
+
+                if (dot.eyePartIndex === 0) {
+                    // White part (outer)
+                    radius = config.eyeFormation.outerRadius;
+                } else if (dot.eyePartIndex === 1) {
+                    // Iris part (middle)
+                    radius = config.eyeFormation.irisRadius;
+                } else {
+                    // Pupil part (inner)
+                    radius = config.eyeFormation.pupilRadius;
+                }
+
                 const targetX = eyeTarget.x + p.cos(angle) * radius;
                 const targetY = eyeTarget.y + p.sin(angle) * radius;
                 dot.targetPosition = p.createVector(targetX, targetY);
@@ -119,8 +152,13 @@ let sketch = function (p) {
             if (dot.position.y < 0) dot.position.y = p.height;
             if (dot.position.y > p.height) dot.position.y = 0;
 
-            // Draw dot
-            p.fill(dot.color);
+            // Draw dot with its assigned color (only in eye formation)
+            if (isFormingEye) {
+                p.fill(dot.color);
+            } else {
+                // Normal color when not in eye formation
+                p.fill(255);
+            }
             p.noStroke();
             p.circle(dot.position.x, dot.position.y, dot.size * 2);
         }
@@ -132,6 +170,7 @@ let sketch = function (p) {
         p.text("Eye Formation: " + (isFormingEye ? "Active" : "Inactive"), 10, 40);
         p.text("Timer: " + eyeFormationTimer, 10, 60);
         p.text("Press 'e' to toggle eye formation", 10, 80);
+        p.text("Press 'f' to force eye formation", 10, 100);
     };
 
     // Key pressed handler
@@ -145,7 +184,7 @@ let sketch = function (p) {
             isFormingEye = true;
             eyeFormationTimer = 0;
             eyeTarget = p.createVector(p.width / 2, p.height / 2);
-            console.log("Forcing eye formation");
+            console.log("Forcing eye formation at center");
         }
     };
 
