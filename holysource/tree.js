@@ -4,7 +4,7 @@ class FractalTree {
         this.ctx = canvas.getContext('2d');
         this.isDrawing = true;
         this.lineWidth = 3;
-        this.color = '#2d3748';
+        this.color = '#fff';
         this.speed = 6; // px per frame
         this.maxDepth = 9;
         this.branches = [];
